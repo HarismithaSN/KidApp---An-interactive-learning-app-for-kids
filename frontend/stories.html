@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Stories — KidApp</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Specific styles for stories page */
+    .stories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      padding: 1rem;
+    }
+
+    .story-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      text-align: center;
+      border-bottom: 5px solid #ffaa00;
+      position: relative;
+    }
+
+    .story-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .story-emoji {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .story-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .story-cat {
+      font-size: 0.85rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Buttons */
+    .add-story-btn {
+      display: inline-block;
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+
+    /* Modal Commons */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: white;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      border-radius: 20px;
+      padding: 2rem;
+      position: relative;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #eee;
+      border: none;
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Reader Modal */
+    .reader-title {
+      font-size: 2rem;
+      color: #ff6b6b;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .reader-settings {
+      background: #f9f9f9;
+      padding: 0.5rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    /* Story Image Animation */
+    .story-img-container {
+      text-align: center;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .story-img {
+      max-width: 100%;
+      height: auto;
+      max-height: 300px;
+      display: inline-block;
+      animation: breathe 6s infinite ease-in-out;
+    }
+
+    @keyframes breathe {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .reader-content {
+      font-size: 1.4rem;
+      line-height: 1.8;
+      color: #444;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: left;
+      position: relative;
+      z-index: 10;
+    }
+
+    .reader-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .btn-read {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-stop {
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Add Story Modal */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.8rem;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    .form-actions {
+      text-align: right;
+    }
+
+    .btn-submit {
+      background: #2196f3;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+
+<body class="with-mascot-bg">
+  <div class="page-bg"
+    style="background-image: url('images/story_bg.png'); background-size: cover; background-position: center;"></div>
+
+  <header class="header">
+    <div class="brand">
+      <a href="index.html" class="logo-link">
+        <div class="logo">🌈</div>
+      </a>
+      <div>
+        <h1>Stories</h1>
+        <p class="tag">Read, Listen & Create</p>
+      </div>
+    </div>
+    <div class="profile">
+      <button class="add-story-btn" id="openAddStory">✍️ Write Story</button>
+      <a href="index.html" class="pill ghost">🏠 Home</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="stories-grid" id="storiesGrid">
+      <div class="loading">Loading stories... 🚀</div>
+    </div>
+  </main>
+
+  <!-- Reader Modal -->
+  <div class="modal-overlay" id="readerModal">
+    <div class="modal-content">
+      <button class="close-modal" id="closeReader">×</button>
+      <h2 class="reader-title" id="readerTitle">Story Title</h2>
+
+      <div class="reader-settings">
+        <label for="readerMood">🎭 <strong>Voice Mood:</strong></label>
+        <select id="readerMood">
+          <option value="happy">😊 Happy & Excited</option>
+          <option value="calm" selected>😌 Calm & Bedtime</option>
+          <option value="spooky">👻 Mysterious / Spooky</option>
+          <option value="fast">⚡ Super Fast</option>
+          <option value="robot">🤖 Robot</option>
+        </select>
+      </div>
+
+      <div class="reader-body" id="readerBody">Story content goes here...</div>
+      <div class="reader-actions">
+        <button class="btn-read" id="btnRead">🔊 Read to Me</button>
+        <button class="btn-stop" id="btnStop">⏹️ Stop</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Story Modal -->
+  <div class="modal-overlay" id="addStoryModal">
+    <div class="modal-content">
+      <button class="close-modal" id="closeAddStory">×</button>
+      <h2 style="text-align:center; color:#2196f3;">Write Your Own Story</h2>
+
+      <div class="form-group">
+        <label>Story Title</label>
+        <input type="text" id="newTitle" placeholder="The Magical...">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="newCategory">
+          <option value="Adventure">Adventure</option>
+          <option value="Fable">Fable</option>
+          <option value="Funny">Funny</option>
+          <option value="Scary">Scary</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Story Image (Optional)</label>
+        <input type="file" id="newImage" accept="image/*">
+      </div>
+      <div class="form-group">
+        <label>Story Content</label>
+        <textarea id="newContent" rows="8" placeholder="Once upon a time..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn-submit" id="submitStory">Publish Story</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/tts.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script>
+    const API_URL = '../backend/api.php';
+    const grid = document.getElementById('storiesGrid');
+
+    // Reader Elements
+    const readerModal = document.getElementById('readerModal');
+    const closeReader = document.getElementById('closeReader');
+    const readerTitle = document.getElementById('readerTitle');
+    const readerBody = document.getElementById('readerBody');
+    const btnRead = document.getElementById('btnRead');
+    const btnStop = document.getElementById('btnStop');
+    const readerMood = document.getElementById('readerMood');
+
+    // Add Story Elements
+    const addModal = document.getElementById('addStoryModal');
+    const openAddBtn = document.getElementById('openAddStory');
+    const closeAddBtn = document.getElementById('closeAddStory');
+    const submitBtn = document.getElementById('submitStory');
+
+    async function loadStories() {
+      try {
+        const res = await fetch(API_URL + '?action=get_stories');
+        const data = await res.json();
+        if (data.ok && data.stories) {
+          renderStories(data.stories);
+        } else {
+          grid.innerHTML = '<p class="error">Failed to load stories.</p>';
+        }
+      } catch (e) {
+        console.error(e);
+        grid.innerHTML = '<p class="error">Loading failed.</p>';
+      }
+    }
+
+    function renderStories(stories) {
+      grid.innerHTML = '';
+      if (stories.length === 0) {
+        grid.innerHTML = '<p>No stories found.</p>';
+        return;
+      }
+      stories.forEach(story => {
+        const card = document.createElement('div');
+        card.className = 'story-card';
+        // Use uploaded image if available, else emoji
+        let visual = `<div class="story-emoji">${getStoryEmoji(story.title + ' ' + story.category)}</div>`;
+        if (story.image_path) {
+          visual = `<div class="story-img" style="height:150px; overflow:hidden; border-radius:10px; margin-bottom:10px;">
+                        <img src="${story.image_path}" style="width:100%; height:100%; object-fit:cover;">
+                      </div>`;
+        }
+
+        card.innerHTML = `
+          ${visual}
+          <div class="story-title">${story.title}</div>
+          <div class="story-cat">${story.category || 'User Story'}</div>
+        `;
+        card.addEventListener('click', () => openStory(story));
+        grid.appendChild(card);
+      });
+    }
+
+    function getStoryEmoji(str) {
+      const t = str.toLowerCase();
+      if (t.includes('lion')) return '🦁';
+      if (t.includes('tiger')) return '🐯';
+      if (t.includes('cat')) return '🐱';
+      if (t.includes('dog')) return '🐶';
+      if (t.includes('crow') || t.includes('bird')) return '🦅';
+      if (t.includes('mouse')) return '🐭';
+      if (t.includes('bunny') || t.includes('rabbit')) return '🐰';
+      if (t.includes('scary') || t.includes('ghost')) return '👻';
+      if (t.includes('wolf')) return '🐺';
+      if (t.includes('boy')) return '👦';
+      return '📖';
+    }
+
+    // --- Advanced Human-Like Reader Logic ---
+    let isReading = false;
+    let readingQueue = [];
+    let readerIndex = 0;
+
+    function openStory(story) {
+      readerTitle.textContent = story.title;
+      readerBody.textContent = story.content;
+      readerModal.classList.add('open');
+      stopReading();
+    }
+
+    function stopReading() {
+      isReading = false;
+      document.querySelectorAll('.highlight-sentence').forEach(el => el.classList.remove('highlight-sentence'));
+      if (speechSynthesis.speaking) speechSynthesis.cancel();
+      updateButtons(false);
+      readingQueue = [];
+    }
+
+    function updateButtons(reading) {
+      isReading = reading;
+      btnRead.style.display = reading ? 'none' : 'flex';
+      btnStop.style.display = reading ? 'flex' : 'none';
+    }
+
+    // Heuristic to pick a good voice
+    function getBestVoice() {
+      const voices = speechSynthesis.getVoices();
+      // Priority: Google US English -> Microsoft Zira -> Any English Female -> Any English
+      return voices.find(v => v.name.includes('Google US English')) ||
+        voices.find(v => v.name.includes('Zira')) ||
+        voices.find(v => v.lang.startsWith('en') && v.name.includes('Female')) ||
+        voices.find(v => v.lang.startsWith('en')) ||
+        voices[0];
+    }
+
+    btnRead.addEventListener('click', () => {
+      stopReading();
+
+      // Prepare text
+      const fullText = readerTitle.textContent + '. ' + readerBody.textContent;
+      // Split into sentences using regex, keeping delimiters
+      const rawSentences = fullText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [fullText];
+
+      readingQueue = rawSentences.map(s => s.trim()).filter(s => s.length > 0);
+      readerIndex = 0;
+
+      updateButtons(true);
+      readNextSentence();
+    });
+
+    function readNextSentence() {
+      if (!isReading || readerIndex >= readingQueue.length) {
+        updateButtons(false);
+        return;
+      }
+
+      const text = readingQueue[readerIndex];
+      const u = new SpeechSynthesisUtterance(text);
+
+      // Voice Selection
+      const preferredVoice = getBestVoice();
+      if (preferredVoice) u.voice = preferredVoice;
+
+      // --- EMOTION ENGINE ---
+      // Base: Calm & Easy
+      let rate = 0.9;
+      let pitch = 1.0;
+
+      // Excitement detection
+      if (text.includes('!')) {
+        pitch = 1.2; // Higher pitch for excitement
+        rate = 1.0;  // Slightly faster
+      }
+      else if (text.includes('?')) {
+        pitch = 1.1; // Rising for questions
+      }
+      else if (text.length > 100) {
+        rate = 0.85; // Slow down for long complex sentences
+      }
+
+      // Apply Mood Override if selected, otherwise use Auto-Emotion
+      const mood = readerMood.value;
+      if (mood === 'happy') { pitch = Math.max(pitch, 1.2); rate = Math.max(rate, 1.0); }
+      else if (mood === 'spooky') { pitch = 0.6; rate = 0.8; }
+      else if (mood === 'fast') { rate = 1.4; }
+      else if (mood === 'robot') { pitch = 0.5; rate = 0.9; }
+
+      // Apply
+      u.pitch = pitch;
+      u.rate = rate;
+
+      u.onend = () => {
+        readerIndex++;
+        // Small pause between sentences for "Human" feel
+        setTimeout(readNextSentence, 300);
+      };
+      u.onerror = (e) => {
+        console.error(e);
+        readerIndex++;
+        readNextSentence();
+      };
+
+      window.speechSynthesis.speak(u);
+    }
+
+    btnStop.addEventListener('click', stopReading);
+
+    closeReader.addEventListener('click', () => {
+      readerModal.classList.remove('open');
+      stopReading();
+    });
+
+    // --- Add Story Logic ---
+    openAddBtn.addEventListener('click', () => addModal.classList.add('open'));
+    closeAddBtn.addEventListener('click', () => addModal.classList.remove('open'));
+
+    submitBtn.addEventListener('click', async () => {
+      const title = document.getElementById('newTitle').value;
+      const content = document.getElementById('newContent').value;
+      const category = document.getElementById('newCategory').value;
+      const imageFile = document.getElementById('newImage').files[0];
+
+      if (!title || !content) {
+        alert('Please fill in title and content!');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Publishing...';
+
+      try {
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('category', category);
+        if (imageFile) formData.append('image', imageFile);
+
+        const res = await fetch(API_URL + '?action=add_story', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.ok) {
+          alert('Story Published! 🌟');
+          addModal.classList.remove('open');
+          // clear form
+          document.getElementById('newTitle').value = '';
+          document.getElementById('newContent').value = '';
+          document.getElementById('newImage').value = '';
+          loadStories(); // reload list
+        } else {
+          alert('Error: ' + (data.error || 'Unknown'));
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Network error.');
+      }
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Publish Story';
+    });
+
+    loadStories();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — KidApp</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    }
+
+    .login-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #eee;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      color: #aaa;
+      transition: 0.3s;
+    }
+
+    .tab.active {
+      border-bottom: 3px solid #ab47bc;
+      color: #ab47bc;
+    }
+
+    .login-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      color: #f48fb1;
+      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      text-align: center;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #f48fb1;
+      box-shadow: 0 0 8px rgba(244, 143, 177, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 50px;
+      background: #ab47bc;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(171, 71, 188, 0.4);
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #ba68c8;
+      transform: translateY(-3px);
+    }
+
+    .hidden-form {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-card">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('login')">Log In</div>
+      <div class="tab" onclick="switchTab('register')">Create Account</div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="formLogin">
+      <div class="login-icon">🦄</div>
+      <h1>Welcome Back!</h1>
+      <p>Enter your name to play.</p>
+      <div id="errLogin" style="color:red; display:none; margin-bottom:10px;"></div>
+      <input type="text" id="userLogin" placeholder="Your Name" autocomplete="off">
+      <button onclick="doLogin()">Track My Progress 🚀</button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="formRegister" class="hidden-form">
+      <div class="login-icon">✨</div>
+      <h1>New Explorer!</h1>
+      <p>Create a profile to start.</p>
+      <div id="errRegister" style="color:red; display:none; margin-bottom:10px;"></div>
+      <input type="text" id="userRegister" placeholder="Kid's Name" autocomplete="off">
+      <input type="text" id="parentName" placeholder="Parent's Name" autocomplete="off" style="margin-top:10px;">
+      <input type="email" id="parentEmail" placeholder="Parent's Email" autocomplete="off" style="margin-top:10px;">
+      <button onclick="doRegister()"
+        style="background:#00bcd4; box-shadow: 0 5px 15px rgba(0, 188, 212, 0.4); margin-top:10px;">Create
+        Account 🌟</button>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = '../backend/api.php';
+
+    function switchTab(mode) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.hidden-form').forEach(f => { f.style.display = 'none'; f.classList.add('hidden-form') });
+
+      if (mode === 'login') {
+        document.querySelector('.tab:nth-child(1)').classList.add('active');
+        document.getElementById('formLogin').style.display = 'block';
+      } else {
+        document.querySelector('.tab:nth-child(2)').classList.add('active');
+        document.getElementById('formRegister').style.display = 'block';
+        document.getElementById('formLogin').style.display = 'none'; // Ensure hide
+      }
+      // Clear errors
+      document.getElementById('errLogin').style.display = 'none';
+      document.getElementById('errRegister').style.display = 'none';
+    }
+
+    async function doLogin() {
+      const name = document.getElementById('userLogin').value.trim();
+      if (!name) return;
+      const btn = event.target;
+      const originalText = btn.innerText;
+      btn.innerText = 'Checking...'; btn.disabled = true;
+
+      try {
+        const res = await fetch(API_URL + '?action=login&name=' + encodeURIComponent(name));
+        const data = await res.json();
+        if (data.ok) {
+          localStorage.setItem('kidAppUser', JSON.stringify(data.user));
+          window.location.href = 'index.html?welcome=true'; // Flag for animation
+        } else {
+          showErr('errLogin', data.error || 'Login failed');
+          btn.innerText = originalText; btn.disabled = false;
+        }
+      } catch (e) {
+        showErr('errLogin', 'Network error');
+        btn.innerText = originalText; btn.disabled = false;
+      }
+    }
+
+    async function doRegister() {
+      const name = document.getElementById('userRegister').value.trim();
+      const parentName = document.getElementById('parentName').value.trim();
+      const parentEmail = document.getElementById('parentEmail').value.trim();
+
+      if (!name) { showErr('errRegister', 'Kid name required'); return; }
+      if (!parentEmail) { showErr('errRegister', 'Parent email required'); return; }
+
+      const btn = event.target;
+      const originalText = btn.innerText;
+      btn.innerText = 'Creating...'; btn.disabled = true;
+
+      try {
+        const res = await fetch(API_URL + '?action=register', {
+          method: 'POST',
+          body: JSON.stringify({ name, parent_name: parentName, parent_email: parentEmail })
+        });
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          console.error("Server response:", text);
+          throw new Error("Server returned invalid JSON");
+        }
+
+        if (data.ok) {
+          localStorage.setItem('kidAppUser', JSON.stringify(data.user));
+          // New user -> Profile to setup
+          window.location.href = 'profile.html';
+        } else {
+          showErr('errRegister', data.error || 'Failed to create');
+          btn.innerText = originalText; btn.disabled = false;
+        }
+      } catch (e) {
+        console.error(e);
+        showErr('errRegister', 'Error: ' + e.message);
+        btn.innerText = originalText; btn.disabled = false;
+      }
+    }
+
+    function showErr(id, msg) {
+      const el = document.getElementById(id);
+      el.style.display = 'block';
+      el.innerText = msg;
+    }
+  </script>
+</body>
+
+</html>

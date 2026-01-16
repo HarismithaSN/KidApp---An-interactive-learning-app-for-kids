@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Profile — KidApp</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .profile-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .avatar-large {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        input[type="number"],
+        select,
+        input[type="color"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+
+        input[type="color"] {
+            height: 50px;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .save-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body class="sky-theme">
+    <div class="page-bg"></div>
+
+    <div class="profile-container">
+        <div class="avatar-large" id="pAvatar">🚀</div>
+        <h1 id="pName">Explorer</h1>
+        <p>Let's make this app YOURS!</p>
+
+        <div class="form-group">
+            <label>How old are you?</label>
+            <input type="number" id="pAge" min="3" max="15" value="6">
+        </div>
+
+        <div class="form-group">
+            <label>Favorite Animal</label>
+            <select id="pAnimal">
+                <option value="🐶">🐶 Dog</option>
+                <option value="🐱">🐱 Cat</option>
+                <option value="🦁">🦁 Lion</option>
+                <option value="🦄">🦄 Unicorn</option>
+                <option value="🦕">🦕 Dino</option>
+                <option value="🐧">🐧 Penguin</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Favorite Color</label>
+            <input type="color" id="pColor" value="#2196f3">
+            <small>This will change the app theme!</small>
+        </div>
+
+        <button class="save-btn" onclick="saveProfile()">Save My Profile ✅</button>
+        <br><br>
+        <a href="index.html" style="color: #888; text-decoration: none;">&larr; Back to Home</a>
+    </div>
+
+    <script>
+        const API_URL = '../backend/api.php';
+        const userStr = localStorage.getItem('kidAppUser');
+        if (!userStr) window.location.href = 'login.html';
+        const user = JSON.parse(userStr);
+
+        document.getElementById('pName').textContent = user.name;
+        document.getElementById('pAvatar').textContent = user.avatar || '🚀';
+
+        // Load existing
+        fetch(`${API_URL}?action=get_profile&user_id=${user.id}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    const p = data.profile;
+                    document.getElementById('pAge').value = p.age || 6;
+                    document.getElementById('pColor').value = p.fav_color || '#2196f3';
+                    document.getElementById('pAnimal').value = p.fav_animal || '🐶';
+                }
+            });
+
+        async function saveProfile() {
+            const age = document.getElementById('pAge').value;
+            const color = document.getElementById('pColor').value;
+            const animal = document.getElementById('pAnimal').value;
+
+            const res = await fetch(`${API_URL}?action=update_profile`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user.id, age, fav_color: color, fav_animal: animal })
+            });
+            const d = await res.json();
+            if (d.ok) {
+                alert('Saved! You are awesome!');
+                // Update local storage simple user object
+                user.fav_color = color; // Basic caching
+                localStorage.setItem('kidAppUser', JSON.stringify(user));
+                window.location.href = 'index.html';
+            } else {
+                alert(d.error || 'Error saving');
+            }
+        }
+    </script>
+</body>
+
+</html>

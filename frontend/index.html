@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Home — KidApp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="sky-theme">
+  <div class="page-bg"></div>
+
+  <!-- Realistic Clouds -->
+  <div class="bg-real-cloud cloud-1"></div>
+  <div class="bg-real-cloud cloud-2"></div>
+  <div class="bg-real-cloud cloud-3"></div>
+
+  <!-- Particles -->
+  <div class="sparkle-container" id="sparkles"></div>
+
+  <!-- Balloon Container -->
+  <div id="balloon-container"
+    style="position:fixed; bottom:-100px; left:0; width:100%; height:100vh; pointer-events:none; z-index:999;"></div>
+
+  <header class="header transparent-header">
+    <div class="brand">
+      <div class="logo animate-float">🌈</div>
+      <div>
+        <h1>KidApp</h1>
+        <p>Sky Adventure</p>
+      </div>
+    </div>
+    <div class="profile">
+      <div class="cloud-pill">
+        <span id="welcomeUser">Explorer</span>
+        <span class="star-badge">⭐ <strong id="headerScore">0</strong></span>
+      </div>
+      <a href="parents.html" class="pill warning-pill">👨‍👩‍👧 Parents</a>
+      <button onclick="logout()" class="pill ghost">🚪</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Floating Islands Menu -->
+    <div class="cloud-menu">
+      <a href="stories.html" class="island-card island-stories float-1" data-tts="Stories">
+        <div class="island-content">
+          <img src="images/story_icon.png" class="c-icon" alt="Stories"
+            style="width: 120px; height: auto; border-radius: 20px;">
+          <span class="title-text">Stories</span>
+        </div>
+      </a>
+
+      <a href="games.html" class="island-card island-games float-2" data-tts="Games">
+        <div class="island-content">
+          <img src="images/games_icon.png" class="c-icon" alt="Games"
+            style="width: 120px; height: auto; border-radius: 20px;">
+          <span class="title-text">Games</span>
+        </div>
+      </a>
+
+      <a href="learn.html" class="island-card island-learn float-3" data-tts="Learn">
+        <div class="island-content">
+          <img src="images/learn_icon.png" class="c-icon" alt="Learn"
+            style="width: 120px; height: auto; border-radius: 20px;">
+          <span class="title-text">Learn</span>
+          <div class="learn-preview">
+            <span class="learn-badge" style="color:#e91e63">123</span>
+            <span class="learn-badge" style="color:#2196f3">ABC</span>
+            <span class="learn-badge" style="color:#4caf50">🎨</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="animals.html" class="island-card island-animals float-4" data-tts="Animals">
+        <div class="island-content">
+          <img src="images/animals_icon_backup-fotor-bg-remover-20251227131441.png" class="c-icon" alt="Animals"
+            style="width: 120px; height: auto;">
+          <span class="title-text">Animals</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Candy Style Roadmap -->
+    <section class="roadmap-container candy-board">
+      <h2 style="color:#e91e63; text-shadow: 2px 2px 0px #fff;">🍭 Your Saga Maps</h2>
+
+      <div class="saga-grid">
+        <!-- 1. Story Saga -->
+        <div class="saga-col">
+          <div class="saga-header" style="background:#ff4081;">📖 Stories</div>
+          <div class="candy-track">
+            <div class="level-node unlocked" id="lvl_story_0">1</div>
+            <div class="pipe"></div>
+            <div class="level-node" id="ms_story_1">2</div>
+            <div class="pipe"></div>
+            <div class="level-node big-boss" id="ms_story_2">3</div>
+          </div>
+          <div class="points-tag">Score: <span id="storyScore">0</span></div>
+        </div>
+
+        <!-- 2. Game Saga -->
+        <div class="saga-col">
+          <div class="saga-header" style="background:#2196f3;">🎮 Games</div>
+          <div class="candy-track">
+            <div class="level-node unlocked" id="lvl_game_0">1</div>
+            <div class="pipe"></div>
+            <div class="level-node" id="ms_game_1">2</div>
+            <div class="pipe"></div>
+            <div class="level-node big-boss" id="ms_game_2">3</div>
+          </div>
+          <div class="points-tag">Score: <span id="gameScore">0</span></div>
+        </div>
+
+        <!-- 3. Learn Saga -->
+        <div class="saga-col">
+          <div class="saga-header" style="background:#4caf50;">✏️ Learn</div>
+          <div class="candy-track">
+            <div class="level-node unlocked" id="lvl_learn_0">1</div>
+            <div class="pipe"></div>
+            <div class="level-node" id="ms_learn_1">2</div>
+            <div class="pipe"></div>
+            <div class="level-node big-boss" id="ms_learn_2">3</div>
+          </div>
+          <div class="points-tag">Score: <span id="learnScore">0</span></div>
+        </div>
+      </div>
+    </section>
+
+
+  </main>
+
+  <script src="js/tts.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script>
+    // Inline Session Check & Roadmap Logic
+    const userStr = localStorage.getItem('kidAppUser');
+    if (!userStr) window.location.href = 'login.html';
+    const user = JSON.parse(userStr || '{}');
+    document.getElementById('welcomeUser').textContent = user.name;
+
+    // Apply theme if saved
+    if (user.fav_color) {
+      document.documentElement.style.setProperty('--primary-color', user.fav_color);
+      // Dynamic gradient for sky theme
+      document.body.style.background = `linear-gradient(135deg, ${user.fav_color}11 0%, ${user.fav_color}33 100%)`;
+    }
+
+    // Profile Click
+    function openProfile() { window.location.href = 'profile.html'; }
+
+    // Link profile pill
+    document.querySelector('.cloud-pill').onclick = openProfile;
+    document.querySelector('.cloud-pill').style.cursor = 'pointer';
+
+    function logout() {
+      localStorage.removeItem('kidAppUser');
+      window.location.href = 'login.html';
+    }
+
+    async function loadStats() {
+      try {
+        // Get fresh profile color too
+        fetch(`../backend/api.php?action=get_profile&user_id=${user.id}`)
+          .then(r => r.json()).then(d => {
+            if (d.ok && d.profile.fav_color) {
+              document.body.style.background = `linear-gradient(135deg, ${d.profile.fav_color} 20%, #ffffff 100%)`;
+            }
+          });
+
+        const res = await fetch(`../backend/api.php?action=get_stats&user_id=${user.id}`);
+        const data = await res.json();
+        if (data.ok) {
+          const s = data.stats;
+          document.getElementById('headerScore').textContent = s.total_score;
+          document.getElementById('storyScore').textContent = s.story_points;
+          document.getElementById('gameScore').textContent = s.game_points;
+          document.getElementById('learnScore').textContent = s.learn_points;
+
+          updateTrack('story', s.story_points, [50, 200]);
+          updateTrack('game', s.game_points, [100, 500]);
+          updateTrack('learn', s.learn_points, [50, 150]);
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function updateTrack(type, score, thresholds) {
+      const ms1 = document.getElementById(`ms_${type}_1`);
+      const ms2 = document.getElementById(`ms_${type}_2`);
+
+      // Structure: [Node0] [Pipe1] [Node1(ms1)] [Pipe2] [Node2(ms2)]
+      const pipe1 = ms1.previousElementSibling;
+      const pipe2 = ms2.previousElementSibling;
+
+      if (score >= thresholds[0]) {
+        ms1.classList.add('unlocked');
+        pipe1.classList.add('active');
+      }
+      if (score >= thresholds[1]) {
+        ms2.classList.add('unlocked');
+        pipe2.classList.add('active');
+      }
+    } loadStats();
+
+    // Generate Sparkles
+    const sparkleContainer = document.getElementById('sparkles');
+    for (let i = 0; i < 50; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.animationDelay = Math.random() * 5 + 's';
+      s.style.animationDuration = 3 + Math.random() * 4 + 's';
+      sparkleContainer.appendChild(s);
+    }
+  </script>
+</body>
+
+</html>

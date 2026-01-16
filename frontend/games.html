@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Fun Games — KidApp</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/games.css">
+    <style>
+        html,
+        body {
+            background: none !important;
+        }
+    </style>
+</head>
+
+<body style="background:none;">
+    <div class="page-bg"
+        style="background-image: url('images/game_bg.png'); background-size: cover; background-position: center; position:fixed; width:100%; height:100%; z-index:-1;">
+    </div>
+    <header class="header">
+        <div class="brand">
+            <div class="logo">🎮</div>
+            <div>
+                <h1>Game Zone</h1>
+                <p>Play & Learn!</p>
+            </div>
+        </div>
+        <div class="profile">
+            <div class="pill">⭐ Score: <span id="totalScore">0</span></div>
+            <a href="index.html" class="pill ghost">🏠 Home</a>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Game Selection Menu -->
+        <div id="gameMenu" class="games-menu">
+            <!-- Original 4 -->
+            <div class="game-card" onclick="startGame('animal')">
+                <div class="game-icon">🦁</div>
+                <h3>Animal Sounds</h3>
+                <p>Listen & Guess!</p>
+            </div>
+            <div class="game-card" onclick="startGame('memory')">
+                <div class="game-icon">🃏</div>
+                <h3>Memory Match</h3>
+                <p>Find Pairs</p>
+            </div>
+            <div class="game-card" onclick="startGame('math')">
+                <div class="game-icon">🔢</div>
+                <h3>Math Quiz</h3>
+                <p>Simple Math</p>
+            </div>
+            <div class="game-card" onclick="startGame('color')">
+                <div class="game-icon">🎨</div>
+                <h3>Color Fun</h3>
+                <p>Pick Colors</p>
+            </div>
+            <!-- New 6 -->
+            <div class="game-card" onclick="startGame('spell')">
+                <div class="game-icon">🔡</div>
+                <h3>Spelling Bee</h3>
+                <p>Make Words</p>
+            </div>
+            <div class="game-card" onclick="startGame('shape')">
+                <div class="game-icon">🔺</div>
+                <h3>Learn Shapes</h3>
+                <p>Find Shapes</p>
+            </div>
+            <div class="game-card" onclick="startGame('count')">
+                <div class="game-icon">🖐️</div>
+                <h3>Counting</h3>
+                <p>How many?</p>
+            </div>
+            <div class="game-card" onclick="startGame('pattern')">
+                <div class="game-icon">🧩</div>
+                <h3>Patterns</h3>
+                <p>What comes next?</p>
+            </div>
+            <div class="game-card" onclick="startGame('piano')">
+                <div class="game-icon">🎹</div>
+                <h3>Mini Piano</h3>
+                <p>Make Music</p>
+            </div>
+            <div class="game-card" onclick="startGame('odd')">
+                <div class="game-icon">🧐</div>
+                <h3>Odd One Out</h3>
+                <p>Find Different</p>
+            </div>
+            <!-- New Games -->
+            <div class="game-card" onclick="startGame('balloon')">
+                <div class="game-icon">🎈</div>
+                <h3>Balloon Pop</h3>
+                <p>Pop & Score</p>
+            </div>
+            <div class="game-card" onclick="startGame('draw')">
+                <div class="game-icon">🖌️</div>
+                <h3>Drawing Pad</h3>
+                <p>Be Creative</p>
+            </div>
+        </div>
+
+        <!-- 1. Animal Sounds Game (Refined) -->
+        <div id="gameAnimal" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🦁 Animal Sounds</h2>
+            </div>
+            <div class="game-content centered">
+                <button class="big-play-btn" onclick="playCurrentAnimalSound()">🔊 Play Sound</button>
+                <div id="animalOptions" class="options-grid"></div>
+                <div id="animalFeedback" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <!-- 2. Memory Match Game -->
+        <div id="gameMemory" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🃏 Memory Match</h2>
+                <button class="restart-btn" onclick="initMemoryGame()">🔄 Restart</button>
+            </div>
+            <div class="game-content">
+                <div id="memoryGrid" class="memory-grid"></div>
+                <div id="memoryFeedback" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <!-- 3. Math Quiz Game -->
+        <div id="gameMath" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🔢 Math Quiz</h2>
+            </div>
+            <div class="game-content centered">
+                <div class="math-question" id="mathQuestion">1 + 1 = ?</div>
+                <div id="mathOptions" class="options-grid"></div>
+                <div id="mathFeedback" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <!-- 4. Color Fun Game -->
+        <div id="gameColor" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🎨 Color Fun</h2>
+            </div>
+            <div class="game-content centered">
+                <div class="color-instruction" id="colorInstruction">Find RED!</div>
+                <div id="colorOptions" class="options-grid"></div>
+                <div id="colorFeedback" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <!-- 5. Spelling Game -->
+        <div id="gameSpell" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🔡 Spelling Bee</h2>
+            </div>
+            <div class="game-content centered">
+                <div class="spell-image" id="spellImage">🐶</div>
+                <div class="spell-slots" id="spellSlots"></div>
+                <div class="spell-letters" id="spellLetters"></div>
+                <div id="spellFeedback" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <!-- 6. Shape Game -->
+        <div id="gameShape" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🔺 Learn Shapes</h2>
+            </div>
+            <div class="game-content centered">
+                <div class="shape-instruction" id="shapeInstruction">Find the Circle!</div>
+                <div id="shapeOptions" class="options-grid"></div>
+                <div id="shapeFeedback" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <!-- 7. Counting Game -->
+        <div id="gameCount" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🖐️ Counting Fun</h2>
+            </div>
+            <div class="game-content centered">
+                <div id="countObjects" class="count-box"></div>
+                <div class="count-instruction">How many?</div>
+                <div id="countOptions" class="options-grid"></div>
+                <div id="countFeedback" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <!-- 8. Pattern Game -->
+        <div id="gamePattern" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🧩 Logic Patterns</h2>
+            </div>
+            <div class="game-content centered">
+                <div id="patternRow" class="pattern-row"></div>
+                <div class="pattern-instruction">What comes next?</div>
+                <div id="patternOptions" class="options-grid"></div>
+                <div id="patternFeedback" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <!-- 9. Mini Piano -->
+        <div id="gamePiano" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🎹 Mini Piano</h2>
+            </div>
+            <div class="game-content centered">
+                <div class="piano-keys" id="pianoKeys">
+                    <!-- Keys generated by JS -->
+                </div>
+                <div class="piano-instruction">Play a tune!</div>
+            </div>
+        </div>
+
+        <!-- 10. Odd One Out -->
+        <div id="gameOdd" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🧐 Odd One Out</h2>
+            </div>
+            <div class="game-content centered">
+                <div class="odd-instruction">Find the different one!</div>
+                <div id="oddOptions" class="options-grid"></div>
+                <div id="oddFeedback" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <!-- 11. Balloon Pop -->
+        <div id="gameBalloon" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🎈 Balloon Pop</h2>
+                <div class="pill">Score: <span id="balloonScore">0</span></div>
+            </div>
+            <div class="game-content"
+                style="position:relative; height:400px; overflow:hidden; border:2px solid #eee; border-radius:10px; background:#e0f7fa;">
+                <div id="balloonArea" style="width:100%; height:100%;"></div>
+                <button onclick="initBalloonGame()" class="restart-btn"
+                    style="position:absolute; top:10px; right:10px;">Start</button>
+            </div>
+        </div>
+
+        <!-- 12. Drawing Pad -->
+        <div id="gameDraw" class="game-container hidden">
+            <div class="game-header">
+                <button class="back-btn" onclick="showMenu()">⬅ Back</button>
+                <h2>🖌️ Drawing Pad</h2>
+            </div>
+            <div class="game-content centered">
+                <div class="toolbar" style="margin-bottom:10px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <input type="color" id="drawColor" value="#000000">
+                    <input type="range" id="drawSize" min="2" max="20" value="5">
+                    <button class="pill" onclick="clearCanvas()">🗑️ Clear</button>
+                </div>
+                <canvas id="drawCanvas" width="600" height="400"
+                    style="border:2px solid #ccc; background:white; cursor:crosshair; touch-action: none;"></canvas>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/tts.js"></script>
+    <script src="js/celebrate.js"></script>
+    <script src="js/games.js"></script>
+    <script src="js/chatbot.js"></script>
+</body>
+
+</html>

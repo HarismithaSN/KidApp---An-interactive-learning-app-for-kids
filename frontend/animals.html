@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Animals & Birds — KidApp</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Specific styles for animals page */
+        .animals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .animal-profile-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            /* softer shadow */
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #fff;
+        }
+
+        .animal-profile-card.type-Animal {
+            border-color: #ffccbc;
+        }
+
+        .animal-profile-card.type-Bird {
+            border-color: #b3e5fc;
+        }
+
+        .animal-profile-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .animal-emoji {
+            font-size: 5rem;
+            line-height: 1;
+            margin: 1rem 0;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .animal-emoji:active {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .animal-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #444;
+            margin-bottom: 0.5rem;
+        }
+
+        .animal-desc {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .sound-btn {
+            background: #ffeb3b;
+            color: #333;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px #fbc02d;
+            margin-top: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sound-btn:active {
+            box-shadow: 0 0 #fbc02d;
+            transform: translateY(4px);
+        }
+
+        .filter-bar {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid transparent;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            margin: 0 0.25rem;
+        }
+
+        .filter-btn.active {
+            background: white;
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+
+<body class="with-mascot-bg">
+    <div class="page-bg"
+        style="background-image: url('images/ani_bg.png'); background-size: cover; background-position: center;"></div>
+
+    <header class="header">
+        <div class="brand">
+            <a href="index.html" class="logo-link">
+                <div class="logo">🌈</div>
+            </a>
+            <div>
+                <h1>Animals & Birds</h1>
+                <p class="tag">Explore the World</p>
+            </div>
+        </div>
+        <div class="profile">
+            <a href="index.html" class="pill ghost">🏠 Home</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Animal">Animals</button>
+            <button class="filter-btn" data-filter="Bird">Birds</button>
+        </div>
+
+        <div class="animals-grid" id="animalsGrid">
+            <div class="loading">Loading animals... 🐾</div>
+        </div>
+    </main>
+
+    <script src="js/tts.js"></script>
+    <script>
+        const API_URL = '../backend/api.php';
+        const grid = document.getElementById('animalsGrid');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        let allAnimals = [];
+
+        async function loadAnimals() {
+            try {
+                const res = await fetch(API_URL + '?action=get_animals');
+                const data = await res.json();
+                if (data.ok && data.animals) {
+                    allAnimals = data.animals;
+                    renderAnimals(allAnimals);
+                } else {
+                    grid.innerHTML = '<p class="error">Failed to load animals.</p>';
+                }
+            } catch (e) {
+                console.error(e);
+                grid.innerHTML = '<p class="error">Something went wrong.</p>';
+            }
+        }
+
+        function renderAnimals(list) {
+            grid.innerHTML = '';
+            if (list.length === 0) {
+                grid.innerHTML = '<p>No animals found.</p>';
+                return;
+            }
+            list.forEach(animal => {
+                const card = document.createElement('div');
+                card.className = `animal-profile-card type-${animal.type}`;
+
+                let visual = `<div class="animal-emoji" onclick="playSound('${animal.name}', event)">${animal.emoji}</div>`;
+                if (animal.image_path) {
+                    // Use image for visual, keep emoji as fallback? No, replace validation logic
+                    visual = `<div style="height:150px; overflow:hidden; margin:1rem auto; max-width:180px; border-radius:12px;" onclick="playSound('${animal.name}', event)">
+                                <img src="${animal.image_path}" style="width:100%; height:100%; object-fit:contain; cursor:pointer;" alt="${animal.name}">
+                              </div>`;
+                }
+
+                card.innerHTML = `
+          ${visual}
+          <div class="animal-name">${animal.name}</div>
+          <div class="animal-desc">${animal.description}</div>
+          <button class="sound-btn" onclick="playSound('${animal.name}', event)">
+            🔊 Play Sound
+          </button>
+        `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Sound Logic
+        const animalSounds = {
+            'cat': 'Meow! Meow!',
+            'dog': 'Woof! Woof!',
+            'elephant': 'Pawoo! Trumpet sound!',
+            'bird': 'Chirp! Chirp!',
+            'lion': 'Roar! I am the King!',
+            'tiger': 'Growl! Roar!',
+            'frog': 'Ribbit! Ribbit!',
+            'owl': 'Hoot! Hoot!',
+            'peacock': 'Screech! Mayo!',
+            'parrot': 'Squawk! Hello!',
+            'penguin': 'Honk! Honk!',
+            'sheep': 'Baa! Baa!',
+            'cow': 'Moo! Moo!',
+            'wolf': 'Awooo! Howl!',
+            'horse': 'Neigh! Neigh!'
+        };
+
+        function playSound(name, event) {
+            // Prevent tts.js from overriding this
+            if (event && event.stopPropagation) {
+                event.stopPropagation();
+            }
+
+            // check if wav exists (prioritize wav as per recent renames)
+            const audioWav = new Audio(`audio/${name.toLowerCase()}.wav`);
+            audioWav.play().catch(e => {
+                // Try .mp3
+                const audioMp3 = new Audio(`audio/${name.toLowerCase()}.mp3`);
+                audioMp3.play().catch(e2 => {
+                    // Fallback to TTS
+                    const sound = animalSounds[name.toLowerCase()] || '';
+                    const text = name + '. ' + sound;
+
+                    const u = new SpeechSynthesisUtterance(text);
+                    u.lang = 'en-US';
+                    u.pitch = 1.0;
+                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.speak(u);
+                });
+            });
+        }
+
+        // Filters
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Toggle active class
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.dataset.filter;
+                if (filter === 'all') {
+                    renderAnimals(allAnimals);
+                } else {
+                    renderAnimals(allAnimals.filter(a => a.type === filter));
+                }
+            });
+        });
+
+        loadAnimals();
+    </script>
+</body>
+
+</html>

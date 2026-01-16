@@ -1,0 +1,10 @@
+{
+    "name": "KidApp",
+    "short_name": "KidApp",
+    "start_url": "/kidapp/frontend/index.html",
+    "display": "standalone",
+    "background_color": "#f8fbff",
+    "theme_color": "#66ccff",
+    "icons":[]
+  }
+  

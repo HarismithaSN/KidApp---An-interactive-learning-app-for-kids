@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KidApp — Learn</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    :root {
+      --primary: #1e8e3e;
+      --accent: #ffb300;
+      --muted: #6b6b6b;
+      --bg: #f6fbf6;
+      --card: #fff;
+      --glass: rgba(255, 255, 255, 0.6);
+      --radius: 14px;
+      --glass-shadow: 0 6px 18px rgba(16, 24, 40, 0.08);
+    }
+
+    html {
+      background: none;
+    }
+
+    body {
+      font-family: Inter, 'Comic Sans MS', system-ui, Arial;
+      margin: 0;
+      position: relative;
+      color: #222;
+      background: none;
+    }
+
+    .page-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: url('images/learn_page_bg.png') center/cover no-repeat;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      background: var(--primary);
+      color: #fff;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px
+    }
+
+    .brand {
+      display: flex;
+      gap: 14px;
+      align-items: center
+    }
+
+    .logo {
+      font-size: 34px
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px
+    }
+
+    .tag {
+      opacity: .9;
+      font-size: 13px
+    }
+
+    .profile a {
+      background: var(--accent);
+      color: #111;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08)
+    }
+
+    main.container {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 20px;
+      background: transparent;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px
+    }
+
+    /* left column */
+    .leftCard {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--glass-shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px
+    }
+
+    #targetLabel {
+      font-size: 120px;
+      font-weight: 800;
+      color: var(--primary);
+      user-select: none;
+      cursor: pointer
+    }
+
+    #traceCanvas {
+      width: 100%;
+      height: 320px;
+      border-radius: 12px;
+      border: 3px solid rgba(30, 142, 62, 0.12);
+      background: linear-gradient(180deg, #f7fff7, #ffffff)
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px
+    }
+
+    .btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #fff
+    }
+
+    .btn.soft {
+      background: #f0f6f0;
+      color: var(--primary);
+      border: 1px solid rgba(30, 142, 62, 0.08)
+    }
+
+    .feedback {
+      min-height: 22px;
+      font-weight: 700;
+      color: var(--primary)
+    }
+
+    /* right column */
+    .rightCard {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--glass-shadow)
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .tab {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+      background: transparent
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary)
+    }
+
+    section.activity {
+      display: none
+    }
+
+    section.activity.active {
+      display: block
+    }
+
+    .letter-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px
+    }
+
+    .letter-grid button {
+      height: 48px;
+      border-radius: 10px;
+      border: none;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.04);
+      background: linear-gradient(180deg, #e8ffe8, #ffffff)
+    }
+
+    .grid-emoji {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center
+    }
+
+    .memory-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px
+    }
+
+    .memory-card {
+      background: #e9f8e9;
+      border-radius: 8px;
+      height: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      cursor: pointer;
+      border: 1px solid rgba(0, 0, 0, 0.04)
+    }
+
+
+    .count-display {
+      font-size: 44px;
+      text-align: center
+    }
+
+    .numline {
+      padding: 14px;
+      border-radius: 12px;
+      background: #f8feff;
+      border: 1px dashed rgba(0, 0, 0, 0.05);
+      position: relative
+    }
+
+    .number-line-marker {
+      display: inline-block;
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      margin: 0 6px
+    }
+
+    .draggable-number {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fff3e0, #fff);
+      cursor: grab;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      font-weight: 800
+    }
+
+    .explore-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px
+    }
+
+    .explore-tile {
+      background: linear-gradient(180deg, #fff, #f7fff7);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.04)
+    }
+
+    .explore-tile .emoji {
+      font-size: 28px
+    }
+
+    .explore-panel {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff8e6;
+      border: 1px solid rgba(0, 0, 0, 0.03)
+    }
+
+    footer.hint {
+      max-width: 1100px;
+      margin: 12px auto;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    @media (max-width:980px) {
+      main.container {
+        grid-template-columns: 1fr;
+        padding: 12px
+      }
+
+      #traceCanvas {
+        height: 260px
+      }
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted)
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">📘</div>
+      <div>
+        <h1>Learn — Letters & Numbers</h1>
+        <div class="tag">Play, trace, quiz & practice</div>
+      </div>
+    </div>
+    <div class="profile"><a href="index.html">← Home</a></div>
+  </header>
+
+  <main class="container" role="main">
+    <div class="leftCard" aria-live="polite">
+      <div id="targetWrap">
+        <div id="targetLabel" tabindex="0" title="Click or press space to change">A</div>
+      </div>
+      <canvas id="traceCanvas" width="600" height="600" aria-label="Tracing canvas"></canvas>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px">
+        <button id="clearTrace" class="btn soft">🔄 Clear</button>
+        <button id="checkTrace" class="btn primary">✅ Check</button>
+        <button id="nextTarget" class="btn soft">🎲 Random</button>
+      </div>
+      <div class="feedback" id="traceResult" role="status" aria-live="polite"></div>
+      <div class="small">Tip: Tap the big letter to cycle. Your drawings are saved locally.</div>
+    </div>
+
+    <div class="rightCard">
+      <div class="tabs" role="tablist" aria-label="Activities">
+        <button class="tab active" data-tab="draw">✏️ Trace</button>
+        <button class="tab" data-tab="quiz">❓ Quiz</button>
+        <button class="tab" data-tab="az">🔠 A→Z</button>
+        <button class="tab" data-tab="img">🖼️ Match</button>
+        <button class="tab" data-tab="mem">🧠 Memory</button>
+        <button class="tab" data-tab="count">🔢 Count</button>
+        <button class="tab" data-tab="numline">📏 Number Line</button>
+        <button class="tab" data-tab="explore">🔎 Explore</button>
+      </div>
+
+      <section id="draw" class="activity active">
+        <h3>Trace the Letter / Number</h3>
+        <p class="small">Draw the character shown on the left. Press <strong>Check</strong> to score your trace. Scoring
+          uses a simple stroke overlap heuristic (fast and kid-friendly).</p>
+      </section>
+
+      <section id="quiz" class="activity">
+        <h3>Quick Quiz</h3>
+        <p id="quizQuestion">Which of these starts with 'A'?</p>
+        <div id="quizButtons" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"></div>
+        <div id="quizFeedback" class="feedback"></div>
+      </section>
+
+      <section id="az" class="activity">
+        <h3>A → Z Grid</h3>
+        <p class="small">Tap any cell to set it as the active target for tracing.</p>
+        <div class="letter-grid" id="letterGrid"></div>
+        <div id="alphabetStrip" style="margin-top:12px"></div>
+      </section>
+
+      <section id="img" class="activity">
+        <h3>Image / Emoji Match</h3>
+        <p id="imgQuestion">Which emoji matches 'A'?</p>
+        <div id="imgButtons" class="grid-emoji"></div>
+        <div id="imgFeedback" class="feedback"></div>
+      </section>
+
+      <section id="mem" class="activity">
+        <h3>Memory Game</h3>
+        <p class="small">Flip and match pairs. Easy to expand with images or emojis.</p>
+        <div id="memBoard" class="memory-board"></div>
+        <div id="memFeedback" class="feedback"></div>
+      </section>
+
+      <section id="count" class="activity">
+        <h3>Count & Match</h3>
+        <div class="count-display" id="countDisplay">🍎🍎🍎</div>
+        <div id="countButtons" style="display:flex;gap:8px;justify-content:center;margin-top:12px"></div>
+        <div id="countFeedback" class="feedback"></div>
+      </section>
+
+      <section id="numline" class="activity">
+        <h3>Number Line</h3>
+        <p id="numlineInstructions" class="small">Drag the missing number to the blank spot on the line.</p>
+        <div class="numline" id="numlineContainer">
+          <div id="numlineMarkers" style="text-align:center"></div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;justify-content:center">
+          <div id="numlineChoices"></div>
+        </div>
+        <div id="numlineFeedback" class="feedback"></div>
+      </section>
+
+      <section id="explore" class="activity">
+        <h3>Explore Topics</h3>
+        <p class="small">Tap any tile to open a short interactive lesson.</p>
+
+        <div class="explore-grid" id="exploreGrid"></div>
+
+        <div class="explore-panel" id="explorePanel" aria-live="polite">
+          <strong>Select a tile to start a mini-lesson.</strong>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="hint">Open this file in any modern browser. Everything runs locally — no external dependencies. Want
+    audio, images, or a theme change? Ask and I'll add it.</footer>
+
+  <!-- page script then tts helper -->
+  <script src="js/learn.js?v=5"></script>
+  <script src="js/tts.js?v=5"></script>
+</body>
+
+</html>

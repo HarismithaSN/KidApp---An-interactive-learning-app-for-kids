@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Parent Dashboard — KidApp</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Security Modal */
+        #securityModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            transition: opacity 0.5s;
+        }
+
+        .pin-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .pin-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .pin-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .pin-display {
+            font-size: 3rem;
+            letter-spacing: 1rem;
+            min-height: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Dashboard content (hidden initially) */
+        #mainContent {
+            filter: blur(10px);
+            pointer-events: none;
+            transition: filter 0.5s;
+        }
+
+        .unlocked #mainContent {
+            filter: none;
+            pointer-events: auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card h3 {
+            margin-top: 0;
+            color: #444;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2196f3;
+        }
+
+        .stat-bar-container {
+            background: #eee;
+            height: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .stat-bar {
+            height: 100%;
+            background: #4caf50;
+            width: 0%;
+            transition: width 1s;
+        }
+
+        .control-panel {
+            background: linear-gradient(135deg, #fff, #f0f4f8);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            border-color: #2196f3;
+            color: #2196f3;
+        }
+
+        .control-btn.danger {
+            color: #f44336;
+            border-color: #ffcdd2;
+        }
+
+        .control-btn.danger:hover {
+            background: #ffebee;
+        }
+    </style>
+</head>
+
+<body class="with-mascot-bg">
+
+    <!-- Security Modal -->
+    <div id="securityModal">
+        <h2>🔒 Security Check</h2>
+        <p>Please enter Parent PIN</p>
+        <div class="pin-display" id="pinDisplay">****</div>
+        <div class="pin-pad">
+            <button class="pin-btn" onclick="addPin(1)">1</button>
+            <button class="pin-btn" onclick="addPin(2)">2</button>
+            <button class="pin-btn" onclick="addPin(3)">3</button>
+            <button class="pin-btn" onclick="addPin(4)">4</button>
+            <button class="pin-btn" onclick="addPin(5)">5</button>
+            <button class="pin-btn" onclick="addPin(6)">6</button>
+            <button class="pin-btn" onclick="addPin(7)">7</button>
+            <button class="pin-btn" onclick="addPin(8)">8</button>
+            <button class="pin-btn" onclick="addPin(9)">9</button>
+            <button class="pin-btn" onclick="clearPin()">C</button>
+            <button class="pin-btn" onclick="addPin(0)">0</button>
+            <button class="pin-btn" onclick="checkPin()">⏎</button>
+        </div>
+        <br>
+        <a href="index.html" style="color: #aaa;">Cancel</a>
+    </div>
+
+    <div id="mainContent">
+        <div class="page-bg"></div>
+
+        <header class="header">
+            <div class="brand">
+                <div class="logo">📊</div>
+                <div>
+                    <h1>Parent Dashboard</h1>
+                    <p>Report for <span id="kidName">...</span></p>
+                </div>
+            </div>
+            <div class="profile">
+                <a href="index.html" class="pill ghost">🏠 Back to App</a>
+            </div>
+        </header>
+
+        <main class="container">
+
+            <!-- Quick Stats Row -->
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <h3>🌟 Total Score</h3>
+                    <div class="stat-number" id="totalScore">0</div>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar" id="scoreBar" style="background:#fbc02d"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>🎮 Games</h3>
+                    <div class="stat-number" id="gamesCount">0</div>
+                    <div style="color:#666">Highest: <span id="gamesHigh">0</span> pts</div>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar" id="gamesBar" style="background:#2196f3"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>📖 Stories</h3>
+                    <div class="stat-number" id="storiesCount">0</div>
+                    <div style="color:#666">Read Time: <span id="readTime">--</span></div>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar" id="storiesBar" style="background:#e91e63"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>✏️ Learn</h3>
+                    <div class="stat-number" id="learnPoints">0</div>
+                    <div style="color:#666">Progress: Good</div>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar" id="learnBar" style="background:#4caf50"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- "All The Things" Report -->
+            <h2 style="margin-bottom:1rem;">📋 Detailed Child Report</h2>
+            <div class="stat-card" style="margin-bottom: 2rem;">
+                <table id="activityTable" style="width:100%; text-align:left; border-collapse:collapse;">
+                    <thead style="border-bottom:2px solid #eee;">
+                        <tr>
+                            <th style="padding:10px;">Activity</th>
+                            <th style="padding:10px;">Name</th>
+                            <th style="padding:10px;">Score</th>
+                            <th style="padding:10px;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityBody">
+                        <tr>
+                            <td colspan="4" style="padding:20px; text-align:center;">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Settings / Controls -->
+            <h2 style="margin-bottom:1rem;">⚙️ Controls (All Things)</h2>
+            <div class="control-panel">
+                <button class="control-btn" onclick="window.location.href='profile.html'">✏️ Edit Child Profile</button>
+                <button class="control-btn" onclick="toggleSound()">🔊 Toggle App Sound</button>
+                <button class="control-btn warning" onclick="alert('Coming soon: Content Filtering')">🛡️ Content
+                    Filters</button>
+                <button class="control-btn danger" onclick="resetChildProgress()">⚠️ Reset All Progress</button>
+            </div>
+            <br><br>
+        </main>
+    </div>
+
+    <script>
+        // Security Logic
+        let pin = '';
+        const CORRECT_PIN = '1234';
+
+        function updateDisplay() {
+            const dots = '*'.repeat(pin.length);
+            document.getElementById('pinDisplay').textContent = dots || 'Enter PIN';
+        }
+
+        function addPin(n) {
+            if (pin.length < 4) {
+                pin += n;
+                updateDisplay();
+                if (pin.length === 4) setTimeout(checkPin, 300);
+            }
+        }
+
+        function clearPin() {
+            pin = '';
+            updateDisplay();
+        }
+
+        function checkPin() {
+            if (pin === CORRECT_PIN) {
+                // Unlock
+                document.getElementById('securityModal').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('securityModal').style.display = 'none';
+                    document.body.classList.add('unlocked');
+                }, 500);
+            } else {
+                pin = '';
+                document.getElementById('pinDisplay').innerText = '❌ WRONG'; // direct text
+                setTimeout(updateDisplay, 1000);
+            }
+        }
+
+        // Dashboard Logic
+        const userStr = localStorage.getItem('kidAppUser');
+        if (!userStr) window.location.href = 'login.html';
+        const user = JSON.parse(userStr);
+        document.getElementById('kidName').textContent = user.name;
+
+        async function loadDashboard() {
+            try {
+                const res = await fetch(`../backend/api.php?action=get_stats&user_id=${user.id}`);
+                const data = await res.json();
+
+                if (data.ok) {
+                    const s = data.stats;
+                    // Update Text
+                    document.getElementById('totalScore').textContent = s.total_score;
+                    document.getElementById('gamesCount').textContent = s.games_played;
+                    document.getElementById('storiesCount').textContent = s.stories_read;
+                    document.getElementById('learnPoints').textContent = s.learn_points;
+                    document.getElementById('gamesHigh').textContent = s.game_points;
+
+                    // Fake bars for demo visual
+                    document.getElementById('scoreBar').style.width = Math.min(100, s.total_score / 10) + '%';
+                    document.getElementById('gamesBar').style.width = Math.min(100, s.games_played * 10) + '%';
+                    document.getElementById('storiesBar').style.width = Math.min(100, s.stories_read * 20) + '%';
+                    document.getElementById('learnBar').style.width = Math.min(100, s.learn_points / 2) + '%';
+
+                    // Table
+                    const tbody = document.getElementById('activityBody');
+                    tbody.innerHTML = '';
+                    if (data.recent && data.recent.length > 0) {
+                        data.recent.forEach(row => {
+                            const tr = document.createElement('tr');
+                            tr.style.borderBottom = '1px solid #eee';
+                            tr.innerHTML = `
+                                <td style="padding:10px;">${row.activity_type}</td>
+                                <td style="padding:10px;"><b>${row.activity_name}</b></td>
+                                <td style="padding:10px; color:green;">+${row.score}</td>
+                                <td style="padding:10px; color:#888;">${new Date(row.created_at).toLocaleDateString()}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="4" style="padding:20px; text-align:center;">No activity recorded yet.</td></tr>';
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function resetChildProgress() {
+            if (confirm('Are you sure? This will delete all points and progress for ' + user.name)) {
+                alert('This feature would wipe the database entries provided the backend supports it. For now, we are keeping data safe.');
+            }
+        }
+
+        function toggleSound() {
+            alert('Sound settings toggled.');
+        }
+
+        // Init
+        updateDisplay();
+        loadDashboard();
+    </script>
+</body>
+
+</html>

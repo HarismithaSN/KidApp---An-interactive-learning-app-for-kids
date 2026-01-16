@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-box {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            max-width: 500px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #45a049; }
+        #status { 
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background: #dff0d8; color: #3c763d; }
+        .error { background: #f2dede; color: #a94442; }
+    </style>
+</head>
+<body>
+    <h1>Audio Test Page</h1>
+    
+    <div class="test-box">
+        <h2>Test 1: Direct Audio Element</h2>
+        <p>This tests if the browser can play audio at all:</p>
+        <audio id="testAudio" controls>
+            <source src="audio/dog.mp3" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+        <p>If you can't hear anything, check your volume and ensure your browser allows autoplay.</p>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 2: JavaScript Audio Playback</h2>
+        <p>This tests if JavaScript can play audio programmatically:</p>
+        <button onclick="playSound()">Play Dog Sound</button>
+        <div id="status">Click the button to test playback</div>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 3: File Access</h2>
+        <p>Check if the audio file exists and is accessible:</p>
+        <button onclick="checkFile()">Check Audio File</button>
+        <div id="fileStatus"></div>
+    </div>
+
+    <script>
+        function playSound() {
+            const status = document.getElementById('status');
+            status.textContent = 'Playing...';
+            status.className = '';
+            
+            try {
+                const audio = new Audio('audio/dog.mp3');
+                audio.play()
+                    .then(() => {
+                        status.textContent = 'Success! You should hear the dog sound.';
+                        status.className = 'success';
+                    })
+                    .catch(error => {
+                        status.textContent = 'Error playing sound: ' + error.message;
+                        status.className = 'error';
+                        console.error('Audio error:', error);
+                    });
+            } catch (error) {
+                status.textContent = 'Error creating audio: ' + error.message;
+                status.className = 'error';
+                console.error('Error:', error);
+            }
+        }
+
+        function checkFile() {
+            const status = document.getElementById('fileStatus');
+            fetch('audio/dog.mp3')
+                .then(response => {
+                    if (response.ok) {
+                        status.textContent = '✅ File exists and is accessible';
+                        status.className = 'success';
+                    } else {
+                        status.textContent = `❌ Error: ${response.status} ${response.statusText}`;
+                        status.className = 'error';
+                    }
+                })
+                .catch(error => {
+                    status.textContent = '❌ Network error: ' + error.message;
+                    status.className = 'error';
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>

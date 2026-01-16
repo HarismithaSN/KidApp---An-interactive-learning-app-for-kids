@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Animal Sounds</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { 
+            display: block;
+            margin: 10px 0;
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>Test Animal Sounds</h1>
+    <p>Click the buttons to test the animal sounds:</p>
+    
+    <button onclick="playSound('dog')">Play Dog Sound</button>
+    <button onclick="playSound('cat')">Play Cat Sound</button>
+    <button onclick="playSound('cow')">Play Cow Sound</button>
+    <button onclick="playSound('bird')">Play Bird Sound</button>
+
+    <script>
+        function playSound(animal) {
+            const audio = new Audio(`audio/${animal}.mp3`);
+            audio.play().catch(error => {
+                console.error("Error playing sound:", error);
+                alert(`Could not play ${animal} sound. Please check if the file exists at: audio/${animal}.mp3`);
+            });
+        }
+    </script>
+</body>
+</html>
