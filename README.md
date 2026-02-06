@@ -79,8 +79,8 @@ _Add screenshots of your application below._
 
 
 ```md
-![Login Page](screenshots/login.png)
-![Home Page](screenshots/home.png)
+![Login Page](screenshots/image.png)
+![Home Page](screenshots/image.png)
 ![Learn Module](screenshots/learn.png)
 ![Games Module](screenshots/games.png)
 ![AI Robo Tutor](screenshots/ai-tutor.png)
