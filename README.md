@@ -71,17 +71,37 @@ http://localhost/kidapp
 
 ---
 
+## 🔐 Security
+- Parent-only access using PIN  
+- Secure session handling  
+- Child-safe navigation  
 
-## 📸 Screenshots
+---
 
+## 🌟 Advantages
+- Makes learning enjoyable and engaging  
+- Improves pronunciation and language skills  
+- Encourages independent learning  
+- Enables parental monitoring  
+- Demonstrates full-stack + AI integration  
 
-_Add screenshots of your application below._
+---
 
+## 🔮 Future Enhancements
+- AI-based emotion & pronunciation analysis  
+- Personalized learning paths  
+- Animated AI Robo Tutor  
+- Android & iOS mobile apps  
+- AR-based learning experiences  
+- Offline learning mode  
 
-```md
-![Login Page](screenshots/image.png)
-![Home Page](screenshots/image.png)
-![Learn Module](screenshots/learn.png)
-![Games Module](screenshots/games.png)
-![AI Robo Tutor](screenshots/ai-tutor.png)
-![Parent Dashboard](screenshots/parent-dashboard.png)
+---
+
+## 👩‍💻 Author
+**Harismitha S N**  
+MCA – Dayananda Sagar College of Engineering  
+
+---
+
+## 📄 License
+This project is developed for **academic purposes**.
