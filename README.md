@@ -5,9 +5,9 @@ The platform combines educational content, games, stories, and AI assistance to 
 
 KidApp follows the concept of “Learning Through Play”, ensuring children stay engaged, curious, and motivated throughout their learning journey.
 
-✨ Key Highlights
-Child-friendly and colorful UI
-AI Robo Tutor & Chatbot for interactive guidance
+✨ Key Highlights \n
+Child-friendly and colorful UI\n
+AI Robo Tutor & Chatbot for interactive guidance\n
 Speech-based pronunciation practice
 Learning analytics for parents
 Secure and safe environment for kids
