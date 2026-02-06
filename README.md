@@ -54,21 +54,6 @@ KidApp follows the concept of **“Learning Through Play”**, ensuring children
 
 ---
 
-## ⚙️ Installation & Setup
-
-1. Install **XAMPP**
-2. Copy the project folder into:
-
-htdocs (XAMPP)
-
-3. Start **Apache** and **MySQL**
-4. Import the database using **phpMyAdmin**
-5. Open in browser:
-
-http://localhost/kidapp
-
-
-
 ---
 
 ## 🔐 Security
